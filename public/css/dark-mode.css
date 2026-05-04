@@ -1,0 +1,685 @@
+/* ═══════════════════════════════════════════════
+   NEXUS — Premium Gaming Dark Mode
+   Always-on dark theme with gaming aesthetics
+   ═══════════════════════════════════════════════ */
+
+/* ── CSS Variables ────────────────────────────── */
+.theme-dark {
+    --dark-bg-primary: #0d1117;
+    --dark-bg-secondary: #161b22;
+    --dark-bg-tertiary: #1c2333;
+    --dark-bg-card: #1a2030;
+    --dark-bg-hover: #242d3d;
+    --dark-border: #2a3444;
+    --dark-border-light: #363f52;
+    --dark-text-primary: #e6edf3;
+    --dark-text-secondary: #8b949e;
+    --dark-text-muted: #6e7681;
+    --dark-glow-purple: rgba(139, 92, 246, 0.15);
+    --dark-glow-blue: rgba(59, 130, 246, 0.15);
+    --dark-accent-purple: #8b5cf6;
+    --dark-accent-blue: #3b82f6;
+    --dark-accent-cyan: #06b6d4;
+}
+
+/* ── Base backgrounds ─────────────────────────── */
+.theme-dark,
+.theme-dark body {
+    background-color: var(--dark-bg-primary) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+.theme-dark .main-content,
+.theme-dark .middle-sidebar-bottom,
+.theme-dark .middle-sidebar-left {
+    background-color: transparent !important;
+}
+
+/* ── Preloader ────────────────────────────────── */
+.theme-dark .preloader {
+    background-color: var(--dark-bg-primary) !important;
+}
+
+/* ── Smooth transitions for all elements ─────── */
+.theme-dark * {
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease;
+}
+.theme-dark a, .theme-dark button, .theme-dark .btn {
+    transition: all 0.2s ease;
+}
+
+/* ── Nav header ───────────────────────────────── */
+.theme-dark .nav-header {
+    background-color: var(--dark-bg-secondary) !important;
+    border-bottom: 1px solid var(--dark-border) !important;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.5) !important;
+}
+
+.theme-dark .nav-header .shadow-xs {
+    box-shadow: none !important;
+}
+
+/* ── Logo glow ────────────────────────────────── */
+.theme-dark .logo-text {
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+/* ── Left navigation sidebar ──────────────────── */
+.theme-dark .navigation {
+    background-color: var(--dark-bg-primary) !important;
+    border-right: 1px solid var(--dark-border) !important;
+}
+
+.theme-dark .nav-wrap,
+.theme-dark .nav-wrap.bg-white,
+.theme-dark .nav-wrap.bg-transparent-card {
+    background-color: var(--dark-bg-secondary) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+.theme-dark .nav-content-bttn span,
+.theme-dark .nav-caption span {
+    color: var(--dark-text-secondary) !important;
+}
+
+.theme-dark .nav-content-bttn:hover {
+    background-color: var(--dark-bg-hover) !important;
+    border-radius: 8px;
+}
+
+.theme-dark .nav-content-bttn:hover span {
+    color: #fff !important;
+}
+
+/* ── Cards ────────────────────────────────────── */
+.theme-dark .card {
+    background-color: var(--dark-bg-card) !important;
+    border-color: var(--dark-border) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+.theme-dark .card:hover {
+    border-color: var(--dark-border-light) !important;
+}
+
+.theme-dark .shadow-xss {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* ── Utility backgrounds ──────────────────────── */
+.theme-dark .bg-white {
+    background-color: var(--dark-bg-secondary) !important;
+}
+
+.theme-dark .bg-greylight {
+    background-color: var(--dark-bg-tertiary) !important;
+}
+
+.theme-dark .bg-lightgrey,
+.theme-dark .bg-greyblue,
+.theme-dark .bg-lightblue,
+.theme-dark .bg-lightblue2,
+.theme-dark .bg-lightbrown,
+.theme-dark .bg-lightgreen,
+.theme-dark .bg-grey {
+    background-color: var(--dark-bg-tertiary) !important;
+}
+
+.theme-dark .bg-transparent-card {
+    background-color: var(--dark-bg-secondary) !important;
+}
+
+/* ── Text colors ──────────────────────────────── */
+.theme-dark .text-grey-900,
+.theme-dark .text-grey-800 {
+    color: var(--dark-text-primary) !important;
+}
+
+.theme-dark .text-grey-700 {
+    color: #c9d1d9 !important;
+}
+
+.theme-dark .text-grey-600 {
+    color: #a8b2bd !important;
+}
+
+.theme-dark .text-grey-500 {
+    color: var(--dark-text-secondary) !important;
+}
+
+.theme-dark .text-grey-400 {
+    color: var(--dark-text-muted) !important;
+}
+
+.theme-dark .text-dark,
+.theme-dark .text-black {
+    color: var(--dark-text-primary) !important;
+}
+
+.theme-dark .fw-700,
+.theme-dark .fw-600 {
+    color: var(--dark-text-primary);
+}
+
+/* Override headings */
+.theme-dark h1, .theme-dark h2, .theme-dark h3,
+.theme-dark h4, .theme-dark h5, .theme-dark h6 {
+    color: #fff !important;
+}
+
+/* ── Form controls ────────────────────────────── */
+.theme-dark .form-control,
+.theme-dark .form-select,
+.theme-dark input[type="text"],
+.theme-dark input[type="email"],
+.theme-dark input[type="password"],
+.theme-dark input[type="search"],
+.theme-dark input[type="number"],
+.theme-dark input[type="date"],
+.theme-dark textarea,
+.theme-dark select {
+    background-color: var(--dark-bg-primary) !important;
+    color: var(--dark-text-primary) !important;
+    border-color: var(--dark-border) !important;
+}
+
+.theme-dark .form-control::placeholder,
+.theme-dark input::placeholder,
+.theme-dark textarea::placeholder {
+    color: var(--dark-text-muted) !important;
+}
+
+.theme-dark .form-control:focus,
+.theme-dark .form-select:focus,
+.theme-dark input:focus,
+.theme-dark textarea:focus,
+.theme-dark select:focus {
+    background-color: var(--dark-bg-tertiary) !important;
+    border-color: var(--dark-accent-purple) !important;
+    color: var(--dark-text-primary) !important;
+    box-shadow: 0 0 0 3px var(--dark-glow-purple) !important;
+    outline: none !important;
+}
+
+/* Style2 inputs (login/register) */
+.theme-dark .style2-input {
+    background-color: var(--dark-bg-primary) !important;
+    color: var(--dark-text-primary) !important;
+    border-color: var(--dark-border) !important;
+}
+
+/* ── Borders ──────────────────────────────────── */
+.theme-dark .border-top,
+.theme-dark .border-bottom,
+.theme-dark .border-top-xs,
+.theme-dark .border-end,
+.theme-dark .border-start,
+.theme-dark .border {
+    border-color: var(--dark-border) !important;
+}
+
+.theme-dark .border-light {
+    border-color: var(--dark-border) !important;
+}
+
+/* ── Dropdown menus ───────────────────────────── */
+.theme-dark .dropdown-menu {
+    background-color: var(--dark-bg-secondary) !important;
+    border-color: var(--dark-border) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+}
+
+.theme-dark .dropdown-item {
+    color: var(--dark-text-primary) !important;
+}
+
+.theme-dark .dropdown-item:hover,
+.theme-dark .dropdown-item:focus {
+    background-color: var(--dark-bg-hover) !important;
+    color: #fff !important;
+}
+
+/* ── Settings panel ───────────────────────────── */
+.theme-dark .dropdown-menu-settings,
+.theme-dark .switchcolor-wrap {
+    background-color: var(--dark-bg-secondary) !important;
+    border-color: var(--dark-border) !important;
+}
+
+.theme-dark .switchcolor-wrap h4,
+.theme-dark .switchcolor-wrap span {
+    color: var(--dark-text-primary) !important;
+}
+
+.theme-dark .switchcolor-wrap .bg-white {
+    background-color: var(--dark-bg-card) !important;
+}
+
+/* ── Modals ───────────────────────────────────── */
+.theme-dark .modal-content {
+    background-color: var(--dark-bg-secondary) !important;
+    border-color: var(--dark-border) !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7) !important;
+}
+
+.theme-dark .modal-header {
+    border-bottom-color: var(--dark-border) !important;
+}
+
+.theme-dark .modal-footer {
+    border-top-color: var(--dark-border) !important;
+}
+
+.theme-dark .btn-close {
+    filter: invert(1) !important;
+}
+
+/* ── Badges & tags ────────────────────────────── */
+.theme-dark .badge.bg-greylight {
+    background-color: var(--dark-bg-hover) !important;
+    color: var(--dark-text-primary) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+/* ── Messenger / Chat ─────────────────────────── */
+.theme-dark .bg-white.rounded-xxl.shadow-xss {
+    background-color: var(--dark-bg-secondary) !important;
+}
+
+.theme-dark [style*="background:#f9fafb"],
+.theme-dark [style*="background: #f9fafb"] {
+    background: var(--dark-bg-primary) !important;
+}
+
+.theme-dark .chat.bg-greylight {
+    background-color: var(--dark-bg-tertiary) !important;
+}
+
+/* Chat messages received (non-user) */
+.theme-dark .bg-white.shadow-xss.text-grey-900 {
+    background-color: var(--dark-bg-card) !important;
+}
+
+/* ── Scrollbar styling ────────────────────────── */
+.theme-dark ::-webkit-scrollbar {
+    width: 6px;
+}
+
+.theme-dark ::-webkit-scrollbar-track {
+    background: var(--dark-bg-primary);
+}
+
+.theme-dark ::-webkit-scrollbar-thumb {
+    background: var(--dark-border-light);
+    border-radius: 3px;
+}
+
+.theme-dark ::-webkit-scrollbar-thumb:hover {
+    background: #4a5568;
+}
+
+/* ── Round icon buttons ───────────────────────── */
+.theme-dark .btn-round-md.bg-greylight,
+.theme-dark .btn-round-lg.bg-greylight {
+    background-color: var(--dark-bg-hover) !important;
+}
+
+.theme-dark .bg-greylight.btn-round-lg {
+    background-color: var(--dark-bg-hover) !important;
+}
+
+/* ── Tables ───────────────────────────────────── */
+.theme-dark table,
+.theme-dark .table {
+    color: var(--dark-text-primary) !important;
+    border-color: var(--dark-border) !important;
+}
+
+.theme-dark .table thead th {
+    background-color: var(--dark-bg-primary) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text-secondary) !important;
+}
+
+.theme-dark .table tbody tr {
+    border-color: var(--dark-border) !important;
+}
+
+.theme-dark .table tbody tr:hover {
+    background-color: var(--dark-bg-hover) !important;
+}
+
+.theme-dark .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, .02) !important;
+}
+
+/* ── Pagination ───────────────────────────────── */
+.theme-dark .page-link {
+    background-color: var(--dark-bg-secondary) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+.theme-dark .page-link:hover {
+    background-color: var(--dark-bg-hover) !important;
+    color: #fff !important;
+}
+
+.theme-dark .page-item.active .page-link {
+    background-color: var(--dark-accent-purple) !important;
+    border-color: var(--dark-accent-purple) !important;
+    color: #fff !important;
+    box-shadow: 0 0 12px var(--dark-glow-purple) !important;
+}
+
+.theme-dark .page-item.disabled .page-link {
+    background-color: var(--dark-bg-primary) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text-muted) !important;
+}
+
+/* ── Profile page specifics ───────────────────── */
+.theme-dark .nav-tabs {
+    border-bottom-color: var(--dark-border) !important;
+}
+
+.theme-dark .nav-tabs .nav-link,
+.theme-dark .nav-tabs a {
+    color: var(--dark-text-secondary) !important;
+}
+
+.theme-dark .nav-tabs .nav-link:hover {
+    background-color: var(--dark-bg-hover) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+.theme-dark .nav-tabs .nav-link.active,
+.theme-dark .nav-tabs a.active {
+    color: var(--dark-accent-purple) !important;
+    border-bottom-color: var(--dark-accent-purple) !important;
+}
+
+/* ── Links ────────────────────────────────────── */
+.theme-dark a.text-grey-900,
+.theme-dark a.text-dark {
+    color: var(--dark-text-primary) !important;
+}
+
+.theme-dark a.text-grey-900:hover,
+.theme-dark a.text-dark:hover {
+    color: #fff !important;
+}
+
+/* ── Notification unread highlight ────────────── */
+.theme-dark .bg-greylight[class*="card"] {
+    background-color: var(--dark-bg-hover) !important;
+}
+
+/* ── Misc elements ────────────────────────────── */
+.theme-dark .hover-bg-light:hover {
+    background-color: var(--dark-bg-hover) !important;
+}
+
+.theme-dark hr {
+    border-color: var(--dark-border) !important;
+    opacity: 0.5;
+}
+
+/* ── Search bar ───────────────────────────────── */
+.theme-dark .header-search .form-group input {
+    background-color: var(--dark-bg-primary) !important;
+    color: var(--dark-text-primary) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+.theme-dark .header-search .form-group input:focus {
+    border-color: var(--dark-accent-purple) !important;
+    box-shadow: 0 0 0 3px var(--dark-glow-purple) !important;
+}
+
+.theme-dark .theme-dark-bg {
+    background-color: var(--dark-bg-secondary) !important;
+}
+
+/* ── Buttons ──────────────────────────────────── */
+.theme-dark .btn-outline-danger {
+    border-color: #f85149 !important;
+    color: #f85149 !important;
+}
+
+.theme-dark .btn-outline-danger:hover {
+    background-color: #f85149 !important;
+    color: #fff !important;
+}
+
+.theme-dark .bg-dark {
+    background-color: var(--dark-bg-hover) !important;
+}
+
+/* Primary action buttons get subtle glow */
+.theme-dark .bg-current {
+    box-shadow: 0 2px 12px rgba(var(--theme-color-rgb, 139, 92, 246), 0.2);
+}
+
+.theme-dark .bg-current:hover {
+    box-shadow: 0 4px 20px rgba(var(--theme-color-rgb, 139, 92, 246), 0.35);
+    transform: translateY(-1px);
+}
+
+/* ── Alerts ───────────────────────────────────── */
+.theme-dark .alert {
+    background-color: var(--dark-bg-card) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+.theme-dark .alert-danger {
+    background-color: rgba(248, 81, 73, 0.1) !important;
+    border-color: rgba(248, 81, 73, 0.3) !important;
+    color: #f85149 !important;
+}
+
+.theme-dark .alert-success {
+    background-color: rgba(63, 185, 80, 0.1) !important;
+    border-color: rgba(63, 185, 80, 0.3) !important;
+    color: #3fb950 !important;
+}
+
+.theme-dark .alert-warning {
+    background-color: rgba(210, 153, 34, 0.1) !important;
+    border-color: rgba(210, 153, 34, 0.3) !important;
+    color: #d29922 !important;
+}
+
+.theme-dark .alert-info {
+    background-color: rgba(88, 166, 255, 0.1) !important;
+    border-color: rgba(88, 166, 255, 0.3) !important;
+    color: #58a6ff !important;
+}
+
+/* ── Progress bars ────────────────────────────── */
+.theme-dark .bg-greylight.rounded-pill {
+    background-color: var(--dark-bg-primary) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+/* ── Tasks page ───────────────────────────────── */
+.theme-dark .card .opacity-75 {
+    opacity: 0.6 !important;
+}
+
+/* Meta task completed override */
+.theme-dark .border-warning {
+    border-color: #d29922 !important;
+}
+
+/* ── Selected game highlight ──────────────────── */
+.theme-dark [style*="background-color:#e8f0fe"] {
+    background-color: var(--dark-bg-hover) !important;
+    border: 1px solid var(--dark-accent-blue) !important;
+}
+
+/* ── Messenger specific ───────────────────────── */
+.theme-dark .d-flex.bg-white.rounded-xxl {
+    background-color: var(--dark-bg-secondary) !important;
+}
+
+/* Conversation list hover */
+.theme-dark .list-unstyled li[style*="cursor:pointer"]:hover {
+    background-color: var(--dark-bg-hover) !important;
+}
+
+/* Active conversation */
+.theme-dark .list-unstyled li .bg-greylight {
+    background-color: var(--dark-bg-tertiary) !important;
+}
+
+/* Chat pane background */
+.theme-dark [style*="background:#f9fafb"] {
+    background-color: var(--dark-bg-primary) !important;
+}
+
+/* Chat header */
+.theme-dark .border-bottom.bg-white.d-flex {
+    background-color: var(--dark-bg-secondary) !important;
+}
+
+/* Input area */
+.theme-dark .bg-white.border-top {
+    background-color: var(--dark-bg-secondary) !important;
+}
+
+/* Online indicator border */
+.theme-dark .rounded-circle.bg-success[style*="border:1px solid #fff"] {
+    border-color: var(--dark-bg-secondary) !important;
+}
+
+/* ── Livewire search dropdown ─────────────────── */
+.theme-dark .position-absolute.w-100.bg-white.shadow-xss {
+    background-color: var(--dark-bg-secondary) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+.theme-dark .position-absolute.w-100.bg-white.shadow-xss li:hover {
+    background-color: var(--dark-bg-hover) !important;
+}
+
+/* ── Player finder cards ──────────────────────── */
+.theme-dark .card .p-4.flex-grow-1 {
+    background-color: transparent !important;
+}
+
+/* ── Icon colors in dark mode ─────────────────── */
+.theme-dark .feather-zap.text-success {
+    filter: brightness(1.3);
+}
+
+/* ── Tooltip & Popover ────────────────────────── */
+.theme-dark .tooltip-inner {
+    background-color: var(--dark-bg-card) !important;
+    color: var(--dark-text-primary) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+/* ── Empty state cards ────────────────────────── */
+.theme-dark .card.text-center .feather-users {
+    color: var(--dark-text-muted) !important;
+}
+
+/* ── List group items ─────────────────────────── */
+.theme-dark .list-group-item {
+    background-color: var(--dark-bg-card) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text-primary) !important;
+}
+
+.theme-dark .list-group-item:hover {
+    background-color: var(--dark-bg-hover) !important;
+}
+
+/* ── Invalid feedback ─────────────────────────── */
+.theme-dark .invalid-feedback {
+    color: #f85149 !important;
+}
+
+.theme-dark .is-invalid {
+    border-color: #f85149 !important;
+}
+
+/* ── Selection highlighting ───────────────────── */
+.theme-dark ::selection {
+    background-color: var(--dark-accent-purple);
+    color: #fff;
+}
+
+/* ── Focus visible outline ────────────────────── */
+.theme-dark :focus-visible {
+    outline: 2px solid var(--dark-accent-purple) !important;
+    outline-offset: 2px;
+}
+
+/* ── Gaming accent glow on active nav icons ──── */
+.theme-dark .alert-primary.btn-round-lg {
+    box-shadow: 0 0 16px var(--dark-glow-purple) !important;
+}
+
+/* ── Dot count notification badges ────────────── */
+.theme-dark .dot-count {
+    box-shadow: 0 0 6px rgba(255, 193, 7, 0.4);
+}
+
+/* ── Menu icon hover ──────────────────────────── */
+.theme-dark .menu-icon:hover i {
+    color: #fff !important;
+}
+
+/* ── Profile cover image area ─────────────────── */
+.theme-dark .card .bg-image-cover {
+    filter: brightness(0.85);
+}
+
+/* ── Tags in player cards ─────────────────────── */
+.theme-dark .badge.bg-greylight.text-grey-600 {
+    background-color: var(--dark-bg-hover) !important;
+    color: var(--dark-text-secondary) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+/* ── Fix for inline style bg-white overrides ──── */
+.theme-dark div[class*="bg-white"] {
+    background-color: var(--dark-bg-secondary) !important;
+}
+
+/* ── Register modal styles ────────────────────── */
+.theme-dark .modal .form-control,
+.theme-dark .modal input {
+    background-color: var(--dark-bg-primary) !important;
+    color: var(--dark-text-primary) !important;
+    border-color: var(--dark-border) !important;
+}
+
+/* ── Settings panel inside nav ────────────────── */
+.theme-dark .switchcolor-wrap .card.bg-transparent-card {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+.theme-dark .switchcolor-wrap a.text-dark {
+    color: var(--dark-text-primary) !important;
+}
+
+.theme-dark .switchcolor-wrap a:hover {
+    background-color: var(--dark-bg-hover) !important;
+}
+
+/* ── Smooth card hover lift ───────────────────── */
+.theme-dark .card.shadow-xss:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(139, 92, 246, 0.1) !important;
+}
+
+/* ── Fix for white theme buttons ──────────────── */
+.theme-dark.color-theme-white .bg-current,
+.theme-dark.color-theme-white .bg-current.text-white,
+.theme-dark.color-theme-white .bg-current * {
+    color: var(--dark-bg-primary) !important;
+}
