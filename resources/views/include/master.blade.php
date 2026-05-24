@@ -104,6 +104,31 @@
             justify-content: center;
         }
 
+        .dot-count {
+            width: 8px !important;
+            height: 8px !important;
+            min-width: 8px !important;
+            border: 2px solid #1b2033;
+            box-shadow: 0 0 0 1px rgba(255,255,255,.08);
+        }
+
+        .nexus-badge-count {
+            width: 14px !important;
+            height: 14px !important;
+            min-width: 14px !important;
+            padding: 0 !important;
+            font-size: 8px !important;
+            line-height: 14px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center;
+        }
+
+        .navigation .nav-content {
+            padding-top: 12px;
+        }
+
         /* ── Middle sidebar: don't force min-height (breaks scrolling), just ensure flow ── */
         .middle-sidebar-left .row {
             align-items: flex-start;
@@ -137,6 +162,7 @@
     </style>
 
 @livewireStyles
+    @vite(['resources/js/app.js'])
     @auth
     @endauth
 </head>
@@ -167,12 +193,12 @@
                 {{-- ═══ NOTIFICATION BELL DROPDOWN ═══ --}}
                 @auth
                 @php
-                    $headerNotifs = \App\Models\Notification::where('user_id', auth()->id())->with('fromUser')->latest()->take(3)->get();
+                    $headerNotifs = \App\Models\Notification::where('user_id', auth()->id())->with(['fromUser', 'badge'])->latest()->take(3)->get();
                     $unreadNotifCount = \App\Models\Notification::where('user_id', auth()->id())->where('read', false)->count();
                 @endphp
                 @endauth
                 <a href="#" class="p-2 text-center ms-auto menu-icon" id="dropdownMenu3" data-bs-toggle="dropdown" aria-expanded="false">
-                    @auth @if($unreadNotifCount > 0)<span class="dot-count bg-warning"></span>@endif @endauth
+                    @auth @if($unreadNotifCount > 0)<span class="dot-count bg-warning nexus-notification-dot"></span>@endif @endauth
                     <i class="feather-bell font-xl text-current" title="notifications"></i>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end p-4 rounded-3 border-0 shadow-lg" aria-labelledby="dropdownMenu3" style="min-width:320px;">
@@ -188,6 +214,7 @@
                                 @elseif($hn->type === 'uplift') uplifted your profile
                                 @elseif($hn->type === 'like') liked your post
                                 @elseif($hn->type === 'comment') commented on your post
+                                @elseif($hn->type === 'badge') received the badge <span class="text-current">{{ $hn->badge?->name ?? 'New badge' }}</span>
                                 @endif
                             </p>
                             <span class="font-xsssss text-grey-500">{{ $hn->created_at->diffForHumans() }}</span>
@@ -212,7 +239,7 @@
                 @endphp
                 @endauth
                 <a href="#" class="p-2 text-center ms-3 menu-icon" id="dropdownMenu4" data-bs-toggle="dropdown" aria-expanded="false">
-                    @auth @if($totalUnread > 0)<span class="dot-count bg-danger"></span>@endif @endauth
+                    @auth @if($totalUnread > 0)<span class="dot-count bg-danger nexus-message-dot"></span>@endif @endauth
                     <i class="feather-message-square font-xl text-current" title="messages"></i>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end p-4 rounded-3 border-0 shadow-lg" aria-labelledby="dropdownMenu4" style="min-width:320px;">
@@ -231,7 +258,7 @@
                             <p class="{{ $convUnread > 0 ? 'fw-700 text-grey-900' : 'fw-400 text-grey-500' }} font-xsssss mb-0 text-truncate">{{ $lastMsg ? $lastMsg->body : 'Start a conversation' }}</p>
                         </div>
                         @if($convUnread > 0)
-                        <span class="bg-danger text-white rounded-circle font-xsssss fw-700 d-flex align-items-center justify-content-center ms-2" style="width:18px;height:18px;min-width:18px;">{{ $convUnread }}</span>
+                        <span class="bg-danger text-white rounded-circle font-xsssss fw-700 ms-2 nexus-badge-count nexus-message-count">{{ $convUnread > 9 ? '9+' : $convUnread }}</span>
                         @endif
                     </a>
                     @empty
@@ -299,9 +326,9 @@
                     <div class="nav-wrap bg-white bg-transparent-card rounded-xxl shadow-xss pt-3 pb-1">
                         <div class="nav-caption fw-600 font-xssss text-grey-500"><span></span> Account</div>
                         <ul class="mb-1">
-                            <li><a href="{{ route('messages') }}" class="nav-content-bttn open-font h-auto pt-2 pb-2 position-relative"><i class="font-sm feather-message-square me-3 text-grey-500"></i><span>Chat</span>@auth @if(auth()->user()->unread_message_count > 0)<span class="bg-danger text-white rounded-circle position-absolute font-xsssss fw-700 d-flex align-items-center justify-content-center" style="width:16px;height:16px;top:8px;left:20px;">{{ auth()->user()->unread_message_count > 9 ? '9+' : auth()->user()->unread_message_count }}</span>@endif @endauth</a></li>
+                            <li><a href="{{ route('messages') }}" class="nav-content-bttn open-font h-auto pt-2 pb-2 position-relative"><i class="font-sm feather-message-square me-3 text-grey-500"></i><span>Chat</span>@auth @if(auth()->user()->unread_message_count > 0)<span class="bg-danger text-white rounded-circle position-absolute font-xsssss fw-700 nexus-badge-count nexus-message-count" style="top:8px;left:20px;">{{ auth()->user()->unread_message_count > 9 ? '9+' : auth()->user()->unread_message_count }}</span>@endif @endauth</a></li>
                             <li class="logo d-none d-xl-block d-lg-block"></li>
-                            <li><a href="{{ route('notifications') }}" class="nav-content-bttn open-font h-auto pt-2 pb-2 position-relative"><i class="font-sm feather-bell me-3 text-grey-500"></i><span>Notifications</span>@auth @php $unreadNotifs = \App\Models\Notification::where('user_id', auth()->id())->where('read', false)->count(); @endphp @if($unreadNotifs > 0)<span class="bg-danger text-white rounded-circle position-absolute font-xsssss fw-700 d-flex align-items-center justify-content-center" style="width:16px;height:16px;top:8px;left:20px;">{{ $unreadNotifs > 9 ? '9+' : $unreadNotifs }}</span>@endif @endauth</a></li>
+                            <li><a href="{{ route('notifications') }}" class="nav-content-bttn open-font h-auto pt-2 pb-2 position-relative"><i class="font-sm feather-bell me-3 text-grey-500"></i><span>Notifications</span>@auth @php $unreadNotifs = \App\Models\Notification::where('user_id', auth()->id())->where('read', false)->count(); @endphp @if($unreadNotifs > 0)<span class="bg-danger text-white rounded-circle position-absolute font-xsssss fw-700 nexus-badge-count" style="top:8px;left:20px;">{{ $unreadNotifs > 9 ? '9+' : $unreadNotifs }}</span>@endif @endauth</a></li>
                             <li><a href="{{ route('profile.edit') }}" class="nav-content-bttn open-font h-auto pt-2 pb-2"><i class="font-sm feather-settings me-3 text-grey-500"></i><span>Settings</span></a></li>
                         </ul>
                     </div>
@@ -317,6 +344,7 @@
  
     
     <script src="{{ asset('js/plugin.js') }}"></script>
+    <script src="{{ asset('js/bootstrap-modal-fallback.js') }}"></script>
     <script src="{{ asset('js/lightbox.js') }}"></script>
     <script src="{{ asset('js/scripts.js') }}"></script>
     @livewireScripts

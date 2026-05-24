@@ -37,6 +37,10 @@
                                             commented on your post
                                         @endif
                                         <i class="feather-message-circle text-success"></i>
+                                    @elseif($notif->type === 'badge')
+                                        received the badge
+                                        <span class="text-current">{{ $notif->badge?->name ?? 'New badge' }}</span>
+                                        <i class="feather-award text-warning"></i>
                                     @endif
                                 </p>
                                 <span class="font-xsssss text-grey-500">{{ $notif->created_at->diffForHumans() }}</span>

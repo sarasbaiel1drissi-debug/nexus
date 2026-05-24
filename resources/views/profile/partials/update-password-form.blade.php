@@ -41,7 +41,7 @@
         </button>
 
         @if (session('status') === 'password-updated')
-            <span class="text-success font-xssss ms-3">Password updated successfully ✨</span>
+            <span class="text-success font-xssss ms-3">Password updated successfully</span>
         @endif
     </form>
 </section>

@@ -17,7 +17,8 @@ class UserProfileController extends Controller
             ->where('username', $username)
             ->firstOrFail();
 
-        $posts = Post::with(['user', 'media', 'comments.user', 'likes'])
+        $posts = Post::withAll()
+                    ->visibleTo(Auth::user())
                     ->where('user_id', $user->id)
                     ->orderBy('created_at', 'desc')
                     ->paginate(10);

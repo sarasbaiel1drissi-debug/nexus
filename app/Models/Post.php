@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\User;
 
 class Post extends Model
 {
@@ -54,5 +55,22 @@ class Post extends Model
     public function scopeWithAll($query)
     {
         return $query->with(['user', 'media', 'comments.user', 'likes']);
+    }
+
+    public function scopeVisibleTo($query, ?User $viewer)
+    {
+        return $query->where(function ($visibility) use ($viewer) {
+            $visibility->where('privacy', 'public');
+
+            if ($viewer) {
+                $visibility->orWhere('user_id', $viewer->id)
+                    ->orWhere(function ($followersOnly) use ($viewer) {
+                        $followersOnly->whereIn('privacy', ['followers', 'friends'])
+                            ->whereHas('user.followers', function ($followers) use ($viewer) {
+                                $followers->where('follower_id', $viewer->id);
+                            });
+                    });
+            }
+        });
     }
 }

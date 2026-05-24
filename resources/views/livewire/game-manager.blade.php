@@ -2,8 +2,8 @@
     <h3 class="fw-700 font-xss mb-4 text-grey-900">Your Games</h3>
 
     <div class="row mb-4">
-        @foreach($userGames as $game)
-            <div class="col-md-6 mb-3">
+        @forelse($userGames as $game)
+            <div class="col-md-6 mb-3" wire:key="user-game-{{ $game->id }}">
                 <div class="card shadow-xss border-0 p-3 rounded-xxl">
                     @if($editingGameId === $game->id)
                         {{-- EDITING MODE --}}
@@ -19,8 +19,8 @@
                             </div>
                         </div>
                         <div class="d-flex gap-2">
-                            <button wire:click="updateGame" class="btn btn-sm bg-success text-white rounded-xl font-xssss fw-600 px-3">Save</button>
-                            <button wire:click="cancelEdit" class="btn btn-sm bg-greylight text-grey-700 rounded-xl font-xssss fw-600 px-3">Cancel</button>
+                            <button type="button" wire:click="updateGame" class="btn btn-sm bg-success text-white rounded-xl font-xssss fw-600 px-3">Save</button>
+                            <button type="button" wire:click="cancelEdit" class="btn btn-sm bg-greylight text-grey-700 rounded-xl font-xssss fw-600 px-3">Cancel</button>
                         </div>
                     @else
                         {{-- VIEW MODE --}}
@@ -30,10 +30,10 @@
                                 <p class="font-xssss text-grey-500 mb-0">Rank: {{ $game->pivot->rank ?? 'N/A' }} | Role: {{ $game->pivot->preferred_role ?? 'N/A' }}</p>
                             </div>
                             <div class="d-flex gap-1">
-                                <button wire:click="editGame({{ $game->id }})" class="btn btn-sm bg-greylight text-grey-700 rounded-xl font-xssss fw-600 px-2" title="Edit">
+                                <button type="button" wire:click="editGame({{ $game->id }})" class="btn btn-sm bg-greylight text-grey-700 rounded-xl font-xssss fw-600 px-2" title="Edit">
                                     <i class="feather-edit-2"></i>
                                 </button>
-                                <button wire:click="detachGame({{ $game->id }})" class="btn btn-sm bg-danger text-white rounded-xl font-xssss fw-600 px-2" title="Remove">
+                                <button type="button" wire:click="detachGame({{ $game->id }})" wire:confirm="Remove this game from your profile?" class="btn btn-sm bg-danger text-white rounded-xl font-xssss fw-600 px-2" title="Remove">
                                     <i class="feather-x"></i>
                                 </button>
                             </div>
@@ -41,7 +41,11 @@
                     @endif
                 </div>
             </div>
-        @endforeach
+        @empty
+            <div class="col-12">
+                <p class="font-xssss text-grey-500 mb-0">No games added yet.</p>
+            </div>
+        @endforelse
     </div>
 
     <hr class="mb-4"/>
@@ -52,23 +56,28 @@
         <div class="alert alert-danger font-xssss">{{ session('error') }}</div>
     @endif
 
-    <div class="position-relative mb-3">
+    <div class="mb-3">
         <label class="fw-600 font-xssss text-grey-600 mb-1 d-block">Search Game</label>
         <input type="text" wire:model.live.debounce.300ms="search" class="form-control rounded-xl border-light font-xssss" placeholder="Type a game name...">
 
-        @if(!empty($searchResults))
-            <ul class="position-absolute w-100 shadow-xss rounded-xxl mt-1 list-unstyled" style="z-index:10;">
+        @if(count($searchResults) > 0)
+            <ul class="w-100 shadow-xss rounded-xxl mt-2 list-unstyled bg-white overflow-hidden border border-light">
                 @foreach($searchResults as $game)
                     <li wire:click="selectGame({{ $game['id'] }})" class="p-2 font-xssss text-grey-900" style="cursor:pointer;" onmouseover="this.style.backgroundColor='var(--dark-bg-hover, #f5f5f5)'" onmouseout="this.style.backgroundColor=''">{{ $game['name'] }}</li>
                 @endforeach
             </ul>
         @endif
 
-        @if(strlen($search) > 1 && empty($searchResults) && !$selectedGame)
+        @if(strlen(trim($search)) > 1 && count($searchResults) === 0 && !$selectedGame)
             <div class="mt-2 font-xssss text-grey-500">
-                Game not found. <button wire:click="addNewGame" class="fw-700 text-current border-0 bg-transparent" style="cursor:pointer;">Add "{{ $search }}" to database</button>
+                Game not found.
+                <button type="button" wire:click="addNewGame" wire:loading.attr="disabled" wire:target="addNewGame" class="fw-700 text-current border-0 bg-transparent" style="cursor:pointer;">
+                    Add "{{ trim($search) }}" to my profile
+                </button>
             </div>
         @endif
+        @error('search') <small class="text-danger font-xsssss d-block mt-1">{{ $message }}</small> @enderror
+        @error('newGameName') <small class="text-danger font-xsssss d-block mt-1">{{ $message }}</small> @enderror
     </div>
 
     @if($selectedGame)
@@ -88,7 +97,10 @@
         </div>
     </div>
 
-    <button wire:click="attachGame" class="btn bg-current text-white font-xssss fw-600 rounded-xl px-4 py-2">
+    @error('rank') <small class="text-danger font-xsssss d-block mb-1">{{ $message }}</small> @enderror
+    @error('preferred_role') <small class="text-danger font-xsssss d-block mb-1">{{ $message }}</small> @enderror
+
+    <button type="button" wire:click="attachGame" class="btn bg-current text-white font-xssss fw-600 rounded-xl px-4 py-2">
         Add to My Profile
     </button>
 </div>

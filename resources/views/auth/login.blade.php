@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Log In | {{ config('app.name') }}</title>
 
     <link rel="stylesheet" href="{{ asset('css/themify-icons.css') }}">
@@ -54,18 +55,29 @@
         .login-brand {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 48px;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 28px;
+            text-decoration: none;
         }
 
         .login-brand i {
             font-size: 32px;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
         }
 
         .login-brand span {
             font-size: 28px;
             font-weight: 800;
             letter-spacing: 3px;
+            color: #fff;
+        }
+
+        .nav-logo {
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
         }
 
         .login-title {
@@ -129,6 +141,16 @@
             color: #f85149;
             font-size: 12px;
             margin-top: 6px;
+        }
+
+        .modal-error-summary {
+            background: rgba(248, 81, 73, 0.12);
+            border: 1px solid rgba(248, 81, 73, 0.28);
+            color: #ffb4ad;
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 18px;
+            font-size: 13px;
         }
 
         /* ── Submit button ── */
@@ -289,9 +311,9 @@
 
         <div class="nav-header bg-transparent shadow-none border-0">
             <div class="nav-top w-100 d-flex justify-content-end">
-                <a href="{{ route('home') }}" class="me-auto">
-                    <i class="feather-zap text-success display1-size me-2 ms-0"></i>
-                    <span class="d-inline-block fredoka-font ls-3 fw-600 text-current font-xxl logo-text mb-0">NEXUS.</span>
+                <a href="{{ route('home') }}" class="nav-logo me-auto">
+                    <i class="feather-crosshair text-white display1-size me-2 ms-0" style="text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);"></i>
+                    <span class="d-inline-block fredoka-font ls-3 fw-600 text-white font-xxl logo-text mb-0">NEXUS</span>
                 </a>
                 <a href="#" class="header-btn d-none d-lg-block fw-500 text-white font-xsss p-3 ms-2 w100 text-center lh-20 rounded-xl" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);" data-bs-toggle="modal" data-bs-target="#Modalregister">Register</a>
             </div>
@@ -300,11 +322,16 @@
         <div class="login-row">
             <div class="login-form-col">
                 <div class="login-card">
+                    {{-- <a href="{{ route('home') }}" class="login-brand">
+                        <i class="feather-crosshair"></i>
+                        <span class="fredoka-font">NEXUS</span>
+                    </a> --}}
                     <h1 class="login-title">Welcome back<br>to Nexus</h1>
                     <p class="login-subtitle">Sign in to connect with your gaming friends.</p>
 
                     <form method="POST" action="{{ route('login') }}">
                     @csrf
+                    <input type="hidden" name="login_context" value="main">
 
                         {{-- Email --}}
                         <div class="dark-form-group">
@@ -329,7 +356,7 @@
                         </div>
 
                         {{-- Submit --}}
-                        <button type="submit" class="login-btn">Sign In</button>
+                        <button type="submit" class="login-btn">Sign in</button>
                     </form>
 
                     <div class="register-link">
@@ -340,7 +367,7 @@
             <div class="login-image-col d-none d-xl-block">
                 <img src="{{ asset('images/gaming/login-dark-bg.png') }}" alt="Gaming Setup" class="login-bg-img">
                 <div class="login-overlay-text">
-                    <h3>🎮 Find Your Squad</h3>
+                    {{-- <h3>Find Your Squad</h3> --}}
                     <p>Connect with gamers who share your passion. Team up, compete, and level up together.</p>
                 </div>
             </div>
@@ -366,36 +393,52 @@
 
                 <form method="POST" action="{{ route('register') }}" id="register_client">
                     @csrf
+                    <input type="hidden" name="register_context" value="modal">
+
+                    @if($errors->register->any())
+                        <div class="modal-error-summary">
+                            <strong class="d-block mb-1">Please check your sign up details.</strong>
+                            <ul class="mb-0 ps-3">
+                                @foreach($errors->register->all() as $message)
+                                    <li>{{ $message }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
                     {{-- Username --}}
                     <div class="dark-form-group">
                         <i class="ti-user"></i>
-                        <input type="text" name="username" value="{{ old('username') }}" class="dark-input" placeholder="Username" required>
+                        <input type="text" name="username" value="{{ old('username') }}" class="dark-input {{ $errors->register->has('username') ? 'is-invalid' : '' }}" placeholder="Username" required>
+                        @error('username', 'register')<span class="invalid-feedback d-block">{{ $message }}</span>@enderror
                     </div>
 
                     {{-- Name --}}
                     <div class="dark-form-group">
                         <i class="ti-user"></i>
-                        <input type="text" name="name" value="{{ old('name') }}" class="dark-input" placeholder="Full Name" required>
+                        <input type="text" name="name" value="{{ old('name') }}" class="dark-input {{ $errors->register->has('name') ? 'is-invalid' : '' }}" placeholder="Full Name" required>
+                        @error('name', 'register')<span class="invalid-feedback d-block">{{ $message }}</span>@enderror
                     </div>
 
                     {{-- Email --}}
                     <div class="dark-form-group">
                         <i class="ti-email"></i>
-                        <input type="email" name="email" value="{{ old('email') }}" class="dark-input" placeholder="Email Address" required>
+                        <input type="email" name="email" value="{{ old('email') }}" class="dark-input {{ $errors->register->has('email') ? 'is-invalid' : '' }}" placeholder="Email Address" required>
+                        @error('email', 'register')<span class="invalid-feedback d-block">{{ $message }}</span>@enderror
                     </div>
 
                     {{-- Password --}}
                     <div class="dark-form-group">
                         <i class="ti-lock"></i>
-                        <input type="password" name="password" class="dark-input" placeholder="Password" required>
+                        <input type="password" name="password" class="dark-input {{ $errors->register->has('password') ? 'is-invalid' : '' }}" placeholder="Password" required>
+                        @error('password', 'register')<span class="invalid-feedback d-block">{{ $message }}</span>@enderror
                     </div>
 
                     {{-- Confirm Password --}}
                     <div class="dark-form-group">
                         <i class="ti-lock"></i>
-                        <input type="password" name="password_confirmation" required autocomplete="new-password" placeholder="Confirm Password" class="dark-input @error('password_confirmation') is-invalid @enderror">
-                        @error('password_confirmation')
+                        <input type="password" name="password_confirmation" required autocomplete="new-password" placeholder="Confirm Password" class="dark-input {{ $errors->register->has('password_confirmation') ? 'is-invalid' : '' }}">
+                        @error('password_confirmation', 'register')
                             <span class="invalid-feedback d-block font-xsss">
                                 {{ $message }}
                             </span>
@@ -403,7 +446,7 @@
                     </div>
 
                     <button type="submit" class="login-btn">
-                        Create Account
+                        Create account
                     </button>
                 </form>
 
@@ -413,9 +456,25 @@
 </div>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/plugin.js') }}"></script>
+    <script src="{{ asset('js/bootstrap-modal-fallback.js') }}"></script>
     <script src="{{ asset('js/scripts.js') }}"></script>
+    <script>
+        window.NexusCsrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+        @if(session('open_register_modal') || $errors->register->any())
+            document.addEventListener('DOMContentLoaded', function () {
+                const modalElement = document.getElementById('Modalregister');
+                if (window.bootstrap?.Modal) {
+                    bootstrap.Modal.getOrCreateInstance(modalElement).show();
+                } else {
+                    modalElement.classList.add('show');
+                    modalElement.style.display = 'block';
+                    document.body.classList.add('modal-open');
+                }
+            });
+        @endif
+    </script>
 </body>
 
 </html>

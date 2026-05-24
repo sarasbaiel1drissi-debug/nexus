@@ -1,12 +1,27 @@
 <div>
+    <style>
+        .post-action-button {
+            min-height: 34px;
+            gap: 6px;
+        }
+
+        .post-action-button.is-liked {
+            color: #e11d48 !important;
+        }
+
+        .post-action-button.is-liked i {
+            color: #e11d48 !important;
+        }
+    </style>
+
     {{-- Like & Comment Buttons --}}
     <div class="d-flex align-items-center pt-2 border-top-xs">
-        <button wire:click="toggleLike" class="d-flex align-items-center me-4 font-xssss fw-600 border-0 bg-transparent {{ $isLiked ? 'text-primary' : 'text-grey-700' }}" style="cursor:pointer;">
-            <i class="feather-thumbs-up me-1{{ $isLiked ? ' text-primary' : '' }}"></i>
+        <button type="button" wire:click="toggleLike" class="post-action-button d-flex align-items-center me-4 font-xssss fw-600 border-0 bg-transparent {{ $isLiked ? 'is-liked' : 'text-grey-700' }}" style="cursor:pointer;">
+            <i class="feather-heart"></i>
             <span>{{ $likesCount }}</span>
         </button>
-        <button wire:click="toggleComments" class="d-flex align-items-center font-xssss fw-600 text-grey-700 border-0 bg-transparent" style="cursor:pointer;">
-            <i class="feather-message-circle me-1"></i>
+        <button type="button" wire:click="toggleComments" class="post-action-button d-flex align-items-center font-xssss fw-600 text-grey-700 border-0 bg-transparent" style="cursor:pointer;">
+            <i class="feather-message-circle"></i>
             <span>{{ $commentsCount }}</span>
         </button>
     </div>
@@ -34,7 +49,7 @@
         @endforeach
 
         {{-- New comment form --}}
-        <form wire:submit="addComment" class="d-flex mt-2 gap-2">
+        <form wire:submit.prevent="addComment" class="d-flex mt-2 gap-2">
             <img src="{{ auth()->user()->profile_picture_url }}" class="rounded-circle" style="width:30px;height:30px;object-fit:cover;">
             <input type="text" wire:model="commentText" class="form-control form-control-sm rounded-pill border-light font-xssss flex-grow-1" placeholder="Write a comment...">
             <button type="submit" class="btn btn-sm bg-current text-white rounded-pill px-3 font-xssss">Post</button>

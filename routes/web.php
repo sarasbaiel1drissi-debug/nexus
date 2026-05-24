@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\BadgeController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserProfileController;
@@ -31,9 +32,13 @@ Route::middleware('auth')->group(function () {
         return view('find-players');
     })->name('find-players');
     
-    Route::get('/messages/{userId?}', function ($userId = null) {
-        return view('messages', ['userId' => $userId]);
-    })->name('messages');
+    Route::get('/messages/{userId?}', [ChatController::class, 'index'])->name('messages');
+    Route::get('/chat/conversations', [ChatController::class, 'conversations'])->name('chat.conversations');
+    Route::post('/chat/open/{user}', [ChatController::class, 'open'])->name('chat.open');
+    Route::get('/chat/conversations/{conversation}/messages', [ChatController::class, 'messages'])->name('chat.messages');
+    Route::post('/chat/conversations/{conversation}/messages', [ChatController::class, 'send'])->name('chat.send');
+    Route::post('/chat/conversations/{conversation}/read', [ChatController::class, 'read'])->name('chat.read');
+    Route::get('/chat/conversations/{conversation}/stream', [ChatController::class, 'stream'])->name('chat.stream');
 
     Route::post('/follow/{user}', [SocialController::class, 'follow'])->name('follow');
     Route::post('/uplift/{user}', [SocialController::class, 'uplift'])->name('uplift');
@@ -71,4 +76,3 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 });
 
 require __DIR__.'/auth.php';
-

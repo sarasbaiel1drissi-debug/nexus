@@ -8,6 +8,7 @@ use App\Models\Like;
 use App\Models\Comment;
 use App\Models\Notification;
 use Illuminate\Support\Facades\Auth;
+use App\Services\TaskAutoCompleteService;
 
 class PostInteraction extends Component
 {
@@ -28,11 +29,15 @@ class PostInteraction extends Component
 
         if ($existing) {
             $existing->delete();
+            $this->post->forceFill(['likes_count' => $this->post->likes()->count()])->save();
         } else {
             Like::create([
                 'user_id' => auth()->id(),
                 'post_id' => $this->post->id,
             ]);
+
+            $this->post->forceFill(['likes_count' => $this->post->likes()->count()])->save();
+            app(TaskAutoCompleteService::class)->check(Auth::user(), 'like');
 
             // Notify post owner (not self)
             if ($this->post->user_id !== auth()->id()) {
@@ -63,6 +68,9 @@ class PostInteraction extends Component
             'content' => $this->commentText,
         ]);
 
+        $this->post->forceFill(['comments_count' => $this->post->comments()->count()])->save();
+        app(TaskAutoCompleteService::class)->check(Auth::user(), 'comment');
+
         // Notify post owner (not self)
         if ($this->post->user_id !== auth()->id()) {
             Notification::create([
@@ -81,6 +89,7 @@ class PostInteraction extends Component
         $comment = Comment::find($commentId);
         if ($comment && ($comment->user_id === auth()->id() || $this->post->user_id === auth()->id())) {
             $comment->delete();
+            $this->post->forceFill(['comments_count' => $this->post->comments()->count()])->save();
         }
     }
 

@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Models\Badge;
+use App\Models\Notification;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class BadgeService
 {
@@ -15,10 +17,14 @@ class BadgeService
         $badge = Badge::where('name', 'New User')->first();
 
         if ($badge && !$user->badges()->where('badge_id', $badge->id)->exists()) {
-            $user->badges()->attach($badge->id, [
-                'earned_at' => now(),
-                'expires_at' => now()->addDays(10),
-            ]);
+            DB::transaction(function () use ($user, $badge) {
+                $user->badges()->attach($badge->id, [
+                    'earned_at' => now(),
+                    'expires_at' => now()->addDays(10),
+                ]);
+
+                $this->notifyBadgeAwarded($user, $badge);
+            });
         }
     }
 
@@ -38,12 +44,25 @@ class BadgeService
             $threshold = $badge->criteria['threshold'] ?? 0;
 
             if ($user->xp >= $threshold && !$user->badges()->where('badge_id', $badge->id)->exists()) {
-                $user->badges()->attach($badge->id, [
-                    'earned_at' => now(),
-                    'expires_at' => null,
-                ]);
+                DB::transaction(function () use ($user, $badge) {
+                    $user->badges()->attach($badge->id, [
+                        'earned_at' => now(),
+                        'expires_at' => null,
+                    ]);
+
+                    $this->notifyBadgeAwarded($user, $badge);
+                });
             }
         }
     }
-    
+
+    private function notifyBadgeAwarded(User $user, Badge $badge): void
+    {
+        Notification::create([
+            'user_id' => $user->id,
+            'type' => 'badge',
+            'from_user_id' => $user->id,
+            'badge_id' => $badge->id,
+        ]);
+    }
 }

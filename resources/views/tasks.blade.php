@@ -103,8 +103,8 @@
 
                     @if($completedCount === $totalCount && $totalCount > 0)
                     <div class="card shadow-xss border-0 p-4 rounded-xxl text-center" style="background: linear-gradient(135deg, #7c3aed, #8b5cf6, #6d28d9);">
-                        <h3 class="fw-700 font-xs text-white mb-1">🎉 All Tasks Complete!</h3>
-                        <p class="font-xssss text-white mb-0" style="opacity:0.85;">Great job! Come back tomorrow for new tasks.</p>
+                        <h3 class="fw-700 font-xs text-white mb-1">All Tasks Complete</h3>
+                        <p class="font-xssss text-white mb-0" style="opacity:0.85;">Great job. Come back tomorrow for new tasks.</p>
                     </div>
                     @endif
                 </div>

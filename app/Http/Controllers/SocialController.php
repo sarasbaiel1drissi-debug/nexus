@@ -66,7 +66,7 @@ class SocialController extends Controller
     public function notifications()
     {
         $notifications = Notification::where('user_id', auth()->id())
-            ->with('fromUser')
+            ->with(['fromUser', 'badge'])
             ->latest()
             ->paginate(20);
 

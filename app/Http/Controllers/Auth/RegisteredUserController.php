@@ -9,6 +9,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 use App\Services\BadgeService;
@@ -31,7 +33,7 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'username' => ['required', 'string', 'max:255', 'unique:users'],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
@@ -39,6 +41,17 @@ class RegisteredUserController extends Controller
             'gender' => ['nullable', 'in:male,female'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
+
+        if ($validator->fails()) {
+            if ($request->input('register_context') === 'modal') {
+                return back()
+                    ->withErrors($validator, 'register')
+                    ->withInput($request->except(['password', 'password_confirmation']))
+                    ->with('open_register_modal', true);
+            }
+
+            throw new ValidationException($validator);
+        }
 
         $user = User::create([
             'username' => $request->username,

@@ -36,7 +36,7 @@
                     <div class="tab-content">
                         {{-- MUTUAL --}}
                         <div class="tab-pane fade show active" id="mutual" role="tabpanel">
-                            <div class="row">
+                            <div class="row align-items-stretch">
                                 @forelse($mutuals as $user)
                                     @include('partials.connection-card', ['user' => $user, 'label' => 'Friend'])
                                 @empty
@@ -47,7 +47,7 @@
 
                         {{-- FOLLOWING --}}
                         <div class="tab-pane fade" id="following" role="tabpanel">
-                            <div class="row">
+                            <div class="row align-items-stretch">
                                 @forelse($following as $user)
                                     @include('partials.connection-card', ['user' => $user, 'label' => 'Following'])
                                 @empty
@@ -58,7 +58,7 @@
 
                         {{-- FOLLOWERS --}}
                         <div class="tab-pane fade" id="followers" role="tabpanel">
-                            <div class="row">
+                            <div class="row align-items-stretch">
                                 @forelse($followers as $user)
                                     @include('partials.connection-card', ['user' => $user, 'label' => 'Follower'])
                                 @empty

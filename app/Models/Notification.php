@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Notification extends Model
 {
     protected $table = 'notifications';
-    protected $fillable = ['user_id', 'type', 'from_user_id', 'read', 'post_id'];
+    protected $fillable = ['user_id', 'type', 'from_user_id', 'read', 'post_id', 'badge_id'];
 
     public function user()
     {
@@ -22,5 +22,10 @@ class Notification extends Model
     public function post()
     {
         return $this->belongsTo(\App\Models\Post::class);
+    }
+
+    public function badge()
+    {
+        return $this->belongsTo(Badge::class);
     }
 }

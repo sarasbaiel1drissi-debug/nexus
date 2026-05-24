@@ -2,6 +2,78 @@
 @section('page','profile')
 @section('content')
 
+<style>
+    .profile-cover-frame {
+        height: 250px;
+        background: #111827;
+    }
+
+    .profile-cover-frame img,
+    .profile-avatar-img {
+        object-fit: cover;
+        user-select: none;
+        -webkit-user-drag: none;
+        transition: object-position .18s ease, filter .18s ease;
+        will-change: object-position;
+    }
+
+    .profile-cover-frame.is-editable img,
+    .profile-avatar-img.is-editable {
+        cursor: grab;
+        touch-action: none;
+    }
+
+    .profile-cover-frame.is-moving img,
+    .profile-avatar-img.is-moving {
+        cursor: grabbing;
+        filter: saturate(1.05);
+        transition: none;
+    }
+
+    .profile-avatar-img {
+        width: 100px;
+        height: 100px;
+        border: 4px solid #fff;
+        background: #f4f6fb;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, .12);
+    }
+
+    .profile-header-main {
+        min-height: 88px;
+        padding-top: 10px;
+        padding-bottom: 14px;
+    }
+
+    .profile-name-block {
+        padding-left: 18px;
+    }
+
+    .profile-card-section {
+        min-height: 120px;
+    }
+
+    .post-privacy-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: #f3f4f8;
+        color: #6b7280;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    @media (max-width: 767px) {
+        .profile-cover-frame { height: 190px; }
+        .profile-header-main {
+            margin-left: 0 !important;
+            padding-left: 150px !important;
+            align-items: flex-start !important;
+        }
+    }
+</style>
+
 <div class="main-content right-chat-active">
     <div class="middle-sidebar-bottom">
         <div class="middle-sidebar-left">
@@ -12,11 +84,11 @@
                     <div class="card w-100 border-0 p-0 bg-white shadow-xss rounded-xxl">
 
                         {{-- COVER --}}
-                        <div class="card-body p-0 rounded-xxl overflow-hidden m-3 position-relative" style="height:250px;" id="coverContainer">
+                        <div class="card-body p-0 rounded-xxl overflow-hidden m-3 position-relative profile-cover-frame {{ auth()->id() === $user->id ? 'is-editable' : '' }}" id="coverContainer">
                             <img src="{{ $user->cover_picture ? asset('storage/'.$user->cover_picture) : asset('images/u-bg.jpg') }}"
                                  class="w-100 h-100"
                                  id="coverImage"
-                                 style="object-fit:cover; object-position:{{ $user->cover_position ?? '50% 50%' }}; {{ auth()->id() === $user->id ? 'cursor: grab;' : '' }}">
+                                 style="object-position:{{ $user->cover_position ?? '50% 50%' }};">
                             
                             @if(auth()->id() === $user->id)
                             <div class="position-absolute top-0 end-0 m-3 d-flex gap-2 z-index-1">
@@ -41,8 +113,8 @@
                             <figure class="avatar position-absolute z-index-1" style="top:-40px; left:30px; width:100px; height:100px;">
                                 <img src="{{ $user->profile_picture_url }}"
                                      id="avatarImage"
-                                     class="p-1 bg-white rounded-circle"
-                                     style="width:100px; height:100px; object-fit:cover; border-radius:50%; object-position: {{ $user->profile_position ?? '50% 50%' }}; {{ auth()->id() === $user->id ? 'cursor:grab;' : '' }}">
+                                     class="rounded-circle profile-avatar-img {{ auth()->id() === $user->id ? 'is-editable' : '' }}"
+                                     style="object-position: {{ $user->profile_position ?? '50% 50%' }};">
                                 @if($user->is_online)
                                 <span class="position-absolute rounded-circle bg-success" style="width:14px;height:14px;bottom:5px;right:5px;border:2px solid #fff;"></span>
                                 @endif
@@ -64,8 +136,8 @@
                                 @endif
                             </figure>
 
-                            <div class="d-flex align-items-center justify-content-between ps-5 pe-4" style="margin-left:80px;">
-                                <div class="mt-2 mb-3">
+                            <div class="d-flex align-items-center justify-content-between ps-5 pe-4 profile-header-main" style="margin-left:105px;">
+                                <div class="mt-2 mb-3 profile-name-block">
                                     <h4 class="fw-700 font-sm mb-0">
                                         {{ $user->name }}
                                         @if($user->is_online)
@@ -182,7 +254,7 @@
                         @if($user->region || $user->languages)
                         <div class="mb-3">
                             <h5 class="fw-700 font-xssss text-grey-600 mb-1">Region & Languages</h5>
-                            <p class="font-xssss text-grey-500 mb-0">{{ $user->region ?? 'Not set' }} • {{ $user->languages ?? 'Not set' }}</p>
+                            <p class="font-xssss text-grey-500 mb-0">{{ $user->region ?? 'Not set' }} - {{ $user->languages ?? 'Not set' }}</p>
                         </div>
                         @endif
 
@@ -271,7 +343,7 @@
                             <textarea name="content"
                                       class="w-100 border-0 rounded-xxl p-3 font-xssss text-grey-700 bg-greylight"
                                       rows="3"
-                                      placeholder="What's on your mind?">{{ old('content') }}</textarea>
+                                      placeholder="Share an update">{{ old('content') }}</textarea>
 
                             <div class="mt-3" id="mediaPreview"></div>
 
@@ -290,8 +362,7 @@
                                 <div class="d-flex align-items-center">
                                     <select name="privacy" class="form-select form-select-sm w-auto me-2 font-xssss">
                                         <option value="public">Public</option>
-                                        <option value="friends">Friends</option>
-                                        <option value="private">Only me</option>
+                                        <option value="followers">Followers only</option>
                                     </select>
                                     <button type="submit" class="btn bg-current text-white font-xssss fw-600 rounded-xxl px-3">Post</button>
                                 </div>
@@ -358,12 +429,16 @@
                     {{-- ============ POSTS LIST ============ --}}
                     @forelse($posts as $post)
                     <div class="card w-100 shadow-xss rounded-xxl border-0 p-4 mb-3" id="post-{{ $post->id }}">
-                        <div class="d-flex mb-2">
+                        <div class="d-flex mb-3 align-items-center">
                             <img src="{{ $post->user->profile_picture_url }}"
                                  class="rounded-circle me-2" style="width:45px;height:45px;object-fit:cover;">
                             <div>
                                 <h4 class="fw-700 font-xssss mb-0">{{ $post->user->name }}</h4>
                                 <span class="font-xssss text-grey-500">{{ $post->created_at->diffForHumans() }}</span>
+                                <span class="post-privacy-pill ms-2">
+                                    <i class="{{ in_array($post->privacy, ['followers', 'friends'], true) ? 'feather-users' : 'feather-globe' }}"></i>
+                                    {{ in_array($post->privacy, ['followers', 'friends'], true) ? 'Followers only' : 'Public' }}
+                                </span>
                             </div>
                             
                             @if($post->user_id === auth()->id())
@@ -455,6 +530,8 @@ function openMediaModal(src, type) {
 @if(auth()->id() === $user->id)
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
     // ---- Cover Dragging Logic ----
     const img = document.getElementById('coverImage');
     const container = document.getElementById('coverContainer');
@@ -470,12 +547,14 @@ document.addEventListener('DOMContentLoaded', function() {
         isDragging = true;
         startY = e.clientY;
         img.style.cursor = 'grabbing';
+        container.classList.add('is-moving');
+        e.preventDefault();
     });
 
     window.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
         const deltaY = e.clientY - startY;
-        const sensitivity = 5;
+        const sensitivity = 12;
         let newPercent = currentYPercent - (deltaY / sensitivity);
         newPercent = Math.max(0, Math.min(100, newPercent));
         img.style.objectPosition = `50% ${newPercent}%`;
@@ -486,6 +565,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isDragging) {
             isDragging = false;
             img.style.cursor = 'grab';
+            container.classList.remove('is-moving');
             currentYPercent = parseFloat(img.style.objectPosition.split(' ')[1]) || 50;
             posInput.value = `50% ${currentYPercent}%`;
         }
@@ -501,10 +581,14 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(positionForm.action, {
             method: 'POST',
             body: formData,
-            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            }
         }).then(async res => {
             if (res.ok) {
-                saveBtn.innerHTML = 'Saved!';
+                saveBtn.innerHTML = 'Saved';
                 setTimeout(() => saveBtn.classList.add('d-none'), 2000);
             } else {
                 const data = await res.json().catch(() => ({}));
@@ -534,6 +618,7 @@ document.addEventListener('DOMContentLoaded', function() {
             startAvatarX = e.clientX;
             startAvatarY = e.clientY;
             avatarImg.style.cursor = 'grabbing';
+            avatarImg.classList.add('is-moving');
             // Prevent default drag
             e.preventDefault();
         });
@@ -542,7 +627,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!isAvatarDragging) return;
             const deltaX = e.clientX - startAvatarX;
             const deltaY = e.clientY - startAvatarY;
-            const sensitivity = 2; // Higher is slower dragging
+            const sensitivity = 5;
             
             let newXPercent = currentAvatarXPercent - (deltaX / sensitivity);
             let newYPercent = currentAvatarYPercent - (deltaY / sensitivity);
@@ -559,6 +644,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (isAvatarDragging) {
                 isAvatarDragging = false;
                 avatarImg.style.cursor = 'grab';
+                avatarImg.classList.remove('is-moving');
                 let newPos = avatarImg.style.objectPosition.split(' ');
                 currentAvatarXPercent = parseFloat(newPos[0]) || 50;
                 currentAvatarYPercent = parseFloat(newPos[1]) || 50;
@@ -576,10 +662,14 @@ document.addEventListener('DOMContentLoaded', function() {
             fetch(profilePositionForm.action, {
                 method: 'POST',
                 body: formData,
-                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                }
             }).then(async res => {
                 if (res.ok) {
-                    saveProfileBtn.innerHTML = 'Saved!';
+                    saveProfileBtn.innerHTML = 'Saved';
                     setTimeout(() => {
                         saveProfileBtn.classList.remove('d-block');
                         saveProfileBtn.classList.add('d-none');
@@ -623,7 +713,8 @@ document.addEventListener('DOMContentLoaded', function() {
             body: formData,
             headers: { 
                 'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
             }
         }).then(async res => {
             if(!res.ok) {

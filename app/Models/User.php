@@ -51,7 +51,7 @@ class User extends Authenticatable
     {
         return $this->profile_picture
             ? asset('storage/' . $this->profile_picture)
-            : asset('images/default-avatar.png');
+            : asset('images/default-avatar.svg');
     }
 
     public function getUpliftCountAttribute()

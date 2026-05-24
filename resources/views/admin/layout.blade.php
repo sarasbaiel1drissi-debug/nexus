@@ -238,7 +238,7 @@
     </div>
 
     {{-- Scripts --}}
-    <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js" crossorigin="anonymous"></script>
+    <script src="{{ asset('assets/plugins/global/plugins.bundle.js') }}"></script>
     <script src="{{ asset('admin-assets/js/adminlte.min.js') }}"></script>
     <script>
         const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
@@ -250,6 +250,67 @@
                     scrollbars: { theme: Default.scrollbarTheme, autoHide: Default.scrollbarAutoHide, clickScroll: Default.scrollbarClickScroll },
                 });
             }
+
+            const openModal = (target) => {
+                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                    bootstrap.Modal.getOrCreateInstance(target).show();
+                    return;
+                }
+
+                target.style.display = 'block';
+                target.removeAttribute('aria-hidden');
+                target.setAttribute('aria-modal', 'true');
+                target.classList.add('show');
+                document.body.classList.add('modal-open');
+
+                if (!document.querySelector('.modal-backdrop')) {
+                    const backdrop = document.createElement('div');
+                    backdrop.className = 'modal-backdrop fade show';
+                    document.body.appendChild(backdrop);
+                }
+            };
+
+            const closeModal = (target) => {
+                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                    bootstrap.Modal.getOrCreateInstance(target).hide();
+                    return;
+                }
+
+                target.style.display = 'none';
+                target.setAttribute('aria-hidden', 'true');
+                target.removeAttribute('aria-modal');
+                target.classList.remove('show');
+                document.body.classList.remove('modal-open');
+                document.querySelectorAll('.modal-backdrop').forEach((backdrop) => backdrop.remove());
+            };
+
+            document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target]').forEach((trigger) => {
+                trigger.addEventListener('click', function(event) {
+                    const target = document.querySelector(this.getAttribute('data-bs-target'));
+
+                    if (!target) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    event.stopPropagation();
+                    openModal(target);
+                });
+            });
+
+            document.querySelectorAll('[data-bs-dismiss="modal"]').forEach((trigger) => {
+                trigger.addEventListener('click', function(event) {
+                    const target = this.closest('.modal');
+
+                    if (!target) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    event.stopPropagation();
+                    closeModal(target);
+                });
+            });
         });
     </script>
     @stack('scripts')

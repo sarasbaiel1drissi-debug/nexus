@@ -1,4 +1,61 @@
 <section>
+    <style>
+        .profile-image-grid {
+            align-items: stretch;
+        }
+
+        .profile-image-field {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 154px;
+        }
+
+        .profile-image-preview-row {
+            min-height: 74px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .profile-image-preview {
+            width: 68px;
+            height: 68px;
+            object-fit: cover;
+            background: #111827;
+            flex: 0 0 auto;
+        }
+
+        .profile-cover-preview {
+            width: 132px;
+            height: 54px;
+            object-fit: cover;
+            background: #111827;
+            flex: 0 0 auto;
+        }
+
+        .profile-remove-option {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .profile-remove-option input {
+            width: 14px;
+            height: 14px;
+            margin: 0;
+        }
+
+        .profile-save-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-top: 18px;
+        }
+    </style>
+
     <h2 class="fw-700 font-md text-grey-900 mb-1">Profile Information</h2>
     <p class="font-xssss text-grey-500 mb-4">Update your profile information, avatar, and gaming preferences.</p>
 
@@ -44,7 +101,7 @@
             <div class="col-lg-6 mb-3">
                 <label for="gender" class="fw-600 font-xssss text-grey-600 mb-1 d-block">Gender</label>
                 <select id="gender" name="gender" class="form-control rounded-xl border-light font-xssss">
-                    <option value="">—</option>
+                    <option value="">Not set</option>
                     <option value="male" @selected(old('gender', $user->gender) === 'male')>Male</option>
                     <option value="female" @selected(old('gender', $user->gender) === 'female')>Female</option>
                 </select>
@@ -85,30 +142,28 @@
 
         <hr class="my-4">
         <h4 class="fw-700 font-xsss text-grey-900 mb-3">Profile Pictures</h4>
-        <div class="row">
+        <div class="row profile-image-grid">
             {{-- Profile picture --}}
-            <div class="col-lg-6 mb-3">
+            <div class="col-lg-6 mb-4 profile-image-field">
                 <label class="fw-600 font-xssss text-grey-600 mb-1 d-block">Profile Picture</label>
-                @if($user->profile_picture)
-                    <div class="mb-2">
-                        <img src="{{ $user->profile_picture_url }}" class="rounded-circle" style="width:60px;height:60px;object-fit:cover;">
-                        <label class="ms-2">
-                            <input type="checkbox" name="remove_profile_picture" value="1"> 
-                            <span class="font-xssss text-grey-500">Remove (reset to default)</span>
+                <div class="profile-image-preview-row">
+                    <img src="{{ $user->profile_picture_url }}" class="rounded-circle profile-image-preview" alt="Profile picture preview">
+                    @if($user->profile_picture)
+                        <label class="profile-remove-option">
+                            <input type="checkbox" name="remove_profile_picture" value="1">
+                            <span class="font-xssss text-grey-500">Remove and reset to default</span>
                         </label>
-                    </div>
-                @endif
+                    @endif
+                </div>
                 <input id="profile_picture" name="profile_picture" type="file" accept="image/*" class="form-control rounded-xl border-light font-xssss">
             </div>
 
             {{-- Cover picture --}}
-            <div class="col-lg-6 mb-3">
+            <div class="col-lg-6 mb-4 profile-image-field">
                 <label class="fw-600 font-xssss text-grey-600 mb-1 d-block">Cover Picture</label>
-                @if($user->cover_picture)
-                    <div class="mb-2">
-                        <img src="{{ asset('storage/'.$user->cover_picture) }}" class="rounded-xl" style="width:120px;height:40px;object-fit:cover;">
-                    </div>
-                @endif
+                <div class="profile-image-preview-row">
+                    <img src="{{ $user->cover_picture ? asset('storage/'.$user->cover_picture) : asset('images/u-bg.jpg') }}" class="rounded-xl profile-cover-preview" alt="Cover picture preview">
+                </div>
                 <input id="cover_picture" name="cover_picture" type="file" accept="image/*" class="form-control rounded-xl border-light font-xssss">
             </div>
 
@@ -120,14 +175,14 @@
             </div>
         </div>
 
+        <div class="profile-save-row">
+            <button type="submit" class="btn bg-current text-white font-xssss fw-600 rounded-xl px-4 py-2">
+                Save Changes
+            </button>
+
+            @if (session('success'))
+                <span class="text-success font-xssss">{{ session('success') }}</span>
+            @endif
         </div>
-
-        <button type="submit" class="btn bg-current text-white font-xssss fw-600 rounded-xl px-4 py-2">
-            Save Changes
-        </button>
-
-        @if (session('success'))
-            <span class="text-success font-xssss ms-3">{{ session('success') }}</span>
-        @endif
     </form>
 </section>

@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
@@ -30,6 +30,8 @@ class AdminController extends Controller
         'notifications'    => \App\Models\Notification::class,
         'daily_tasks'      => \App\Models\DailyTask::class,
         'user_daily_tasks' => \App\Models\UserDailyTask::class,
+        'audience_lists'   => \App\Models\AudienceList::class,
+        'audience_list_members' => \App\Models\AudienceListMember::class,
     ];
 
     /**
@@ -37,7 +39,15 @@ class AdminController extends Controller
      */
     protected array $hiddenColumns = [
         'id', 'created_at', 'updated_at', 'deleted_at', 'remember_token',
-        'email_verified_at', 'password',
+        'email_verified_at',
+    ];
+
+    protected array $booleanColumns = [
+        'is_admin', 'completed', 'is_online', 'read',
+    ];
+
+    protected array $jsonColumns = [
+        'criteria', 'metadata', 'playstyle_tags', 'options',
     ];
 
     /**
@@ -93,30 +103,16 @@ class AdminController extends Controller
     {
         $this->validateTable($table);
 
-        $columns = array_diff(
-            Schema::getColumnListing($table),
-            $this->hiddenColumns
-        );
+        $columns = Schema::getColumnListing($table);
+        $data = $this->formData($request, $columns, creating: true);
 
-        $data = $request->only($columns);
-
-        // Hash password if present
-        if (isset($data['password']) && $data['password']) {
-            $data['password'] = Hash::make($data['password']);
+        try {
+            DB::table($table)->insert($data);
+        } catch (QueryException $exception) {
+            return back()
+                ->withInput()
+                ->withErrors(['admin' => $this->databaseErrorMessage($exception)]);
         }
-
-        // Remove empty values
-        $data = array_filter($data, fn($v) => $v !== null && $v !== '');
-
-        // Set timestamps if they exist
-        if (in_array('created_at', Schema::getColumnListing($table))) {
-            $data['created_at'] = now();
-        }
-        if (in_array('updated_at', Schema::getColumnListing($table))) {
-            $data['updated_at'] = now();
-        }
-
-        DB::table($table)->insert($data);
 
         return back()->with('success', 'Record created successfully.');
     }
@@ -128,32 +124,16 @@ class AdminController extends Controller
     {
         $this->validateTable($table);
 
-        $columns = array_diff(
-            Schema::getColumnListing($table),
-            $this->hiddenColumns
-        );
+        $columns = Schema::getColumnListing($table);
+        $data = $this->formData($request, $columns, creating: false);
 
-        $data = $request->only($columns);
-
-        // Hash password if present and not empty
-        if (isset($data['password']) && $data['password']) {
-            $data['password'] = Hash::make($data['password']);
-        } else {
-            unset($data['password']);
+        try {
+            DB::table($table)->where('id', $id)->update($data);
+        } catch (QueryException $exception) {
+            return back()
+                ->withInput()
+                ->withErrors(['admin' => $this->databaseErrorMessage($exception)]);
         }
-
-        // Remove empty strings for nullable fields (keep booleans/zeros)
-        foreach ($data as $key => $value) {
-            if ($value === '') {
-                $data[$key] = null;
-            }
-        }
-
-        if (in_array('updated_at', Schema::getColumnListing($table))) {
-            $data['updated_at'] = now();
-        }
-
-        DB::table($table)->where('id', $id)->update($data);
 
         return back()->with('success', 'Record updated successfully.');
     }
@@ -165,11 +145,15 @@ class AdminController extends Controller
     {
         $this->validateTable($table);
 
-        // Soft-delete if the table has deleted_at, otherwise hard delete
-        if (in_array('deleted_at', Schema::getColumnListing($table))) {
-            DB::table($table)->where('id', $id)->update(['deleted_at' => now()]);
-        } else {
-            DB::table($table)->where('id', $id)->delete();
+        try {
+            // Soft-delete if the table has deleted_at, otherwise hard delete.
+            if (Schema::hasColumn($table, 'deleted_at')) {
+                DB::table($table)->where('id', $id)->update(['deleted_at' => now()]);
+            } else {
+                DB::table($table)->where('id', $id)->delete();
+            }
+        } catch (QueryException $exception) {
+            return back()->withErrors(['admin' => $this->databaseErrorMessage($exception)]);
         }
 
         return back()->with('success', 'Record deleted.');
@@ -183,5 +167,71 @@ class AdminController extends Controller
         if (!array_key_exists($table, $this->modelMap)) {
             abort(404, 'Table not found.');
         }
+    }
+
+    protected function formData(Request $request, array $columns, bool $creating): array
+    {
+        $editableColumns = array_values(array_diff($columns, $this->hiddenColumns));
+        $data = $request->only($editableColumns);
+
+        foreach ($data as $key => $value) {
+            if ($key === 'password') {
+                if ($value === null || $value === '') {
+                    unset($data[$key]);
+                    continue;
+                }
+
+                $data[$key] = Hash::make($value);
+                continue;
+            }
+
+            if (in_array($key, $this->booleanColumns, true)) {
+                $data[$key] = (bool) $value;
+                continue;
+            }
+
+            if (in_array($key, $this->jsonColumns, true)) {
+                $data[$key] = $this->jsonValue($value);
+                continue;
+            }
+
+            if ($value === '') {
+                $data[$key] = null;
+            }
+        }
+
+        if ($creating && in_array('created_at', $columns, true)) {
+            $data['created_at'] = now();
+        }
+
+        if (in_array('updated_at', $columns, true)) {
+            $data['updated_at'] = now();
+        }
+
+        return $data;
+    }
+
+    protected function jsonValue(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return json_encode($decoded);
+            }
+
+            return json_encode(array_values(array_filter(array_map('trim', explode(',', $value)))));
+        }
+
+        return json_encode($value);
+    }
+
+    protected function databaseErrorMessage(QueryException $exception): string
+    {
+        return $exception->errorInfo[2] ?? $exception->getMessage();
     }
 }

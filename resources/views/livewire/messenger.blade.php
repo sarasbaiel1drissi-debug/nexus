@@ -13,11 +13,12 @@
                     $lastMessage = $conv->messages->first();
                     $unread = ($unreadCounts[$conv->id] ?? 0) > 0;
                 @endphp
-                <li wire:click="selectConversation({{ $conv->id }})"
-                    class="p-3 border-bottom {{ $isActive ? 'bg-greylight' : '' }}"
-                    style="cursor:pointer;"
-                    onmouseover="this.style.backgroundColor='var(--dark-bg-hover, #f5f5f5)'"
-                    onmouseout="this.style.backgroundColor='{{ $isActive ? 'var(--dark-bg-tertiary, #f1f1f1)' : '' }}'">
+                <li class="border-bottom {{ $isActive ? 'bg-greylight' : '' }}">
+                    <a href="{{ route('messages', $other->id) }}"
+                       class="d-block p-3 text-decoration-none"
+                       style="cursor:pointer;"
+                       onmouseover="this.style.backgroundColor='var(--dark-bg-hover, #f5f5f5)'"
+                       onmouseout="this.style.backgroundColor='{{ $isActive ? 'var(--dark-bg-tertiary, #f1f1f1)' : '' }}'">
                     <div class="d-flex align-items-center">
                         <div class="position-relative">
                             <img src="{{ $other->profile_picture_url }}" alt="{{ $other->name }}" class="rounded-circle me-3" style="width:40px;height:40px;object-fit:cover;">
@@ -33,6 +34,7 @@
                         <span class="bg-danger text-white rounded-circle font-xsssss fw-700 d-flex align-items-center justify-content-center ms-2" style="width:18px;height:18px;min-width:18px;">{{ $unreadCounts[$conv->id] }}</span>
                         @endif
                     </div>
+                    </a>
                 </li>
             @empty
                 <li class="p-4 text-center font-xssss text-grey-500">No conversations yet.</li>
@@ -53,7 +55,7 @@
             </div>
 
             {{-- Messages List --}}
-            <div class="flex-grow-1 overflow-auto p-3" wire:poll.3s>
+            <div class="flex-grow-1 overflow-auto p-3" id="messages-list">
                 @forelse($messages as $msg)
                     @php
                         $isMe = $msg->sender_id === auth()->id();

@@ -2,6 +2,41 @@
 @section('page','Home')
 @section('content')
 
+<style>
+    .dashboard-compose-actions { gap: 12px; }
+    .dashboard-post-card { margin-bottom: 18px !important; }
+    .dashboard-pagination .pagination { gap: 6px; margin-bottom: 0; }
+    .dashboard-pagination .page-link {
+        border: 0;
+        border-radius: 12px !important;
+        min-width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--theme-color);
+        background: #f3f4f8;
+        font-size: 12px;
+        font-weight: 700;
+    }
+    .dashboard-pagination .page-item.active .page-link {
+        background: var(--theme-color);
+        color: #fff;
+    }
+    .dashboard-pagination .page-item.disabled .page-link { opacity: .45; }
+    .post-privacy-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: #f3f4f8;
+        color: #6b7280;
+        font-size: 10px;
+        font-weight: 700;
+    }
+</style>
+
 <div class="main-content right-chat-active">
     <div class="middle-sidebar-bottom">
         <div class="middle-sidebar-left">
@@ -16,12 +51,12 @@
                             <textarea name="content"
                                       class="w-100 border-0 rounded-xxl p-3 font-xssss text-grey-700 bg-greylight"
                                       rows="3"
-                                      placeholder="What's on your mind?">{{ old('content') }}</textarea>
+                                      placeholder="Share an update">{{ old('content') }}</textarea>
 
                             <div class="mt-3" id="mediaPreview"></div>
 
-                            <div class="d-flex align-items-center mt-3 pt-2 border-top">
-                                <div class="me-auto">
+                            <div class="d-flex flex-wrap align-items-center mt-3 pt-3 border-top dashboard-compose-actions">
+                                <div class="me-auto d-flex flex-wrap align-items-center dashboard-compose-actions">
                                     <label class="btn btn-sm bg-greylight rounded-xxl px-3 py-2 font-xssss fw-600 text-grey-700 cursor-pointer mb-0">
                                         <i class="feather-image text-success me-1"></i> Add Media
                                         <input type="file" name="media[]" id="mediaInput" multiple
@@ -32,11 +67,10 @@
                                             id="clearAllBtn">Clear All</button>
                                     <span class="font-xssss text-grey-500 ms-2" id="fileCount"></span>
                                 </div>
-                                <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center dashboard-compose-actions">
                                     <select name="privacy" class="form-select form-select-sm w-auto me-2 font-xssss">
                                         <option value="public">Public</option>
-                                        <option value="friends">Friends</option>
-                                        <option value="private">Only me</option>
+                                        <option value="followers">Followers only</option>
                                     </select>
                                     <button type="submit" class="btn bg-current text-white font-xssss fw-600 rounded-xxl px-3">Post</button>
                                 </div>
@@ -79,7 +113,7 @@
                                 reader.onload = function(e) {
                                     const col = document.createElement('div'); col.className = 'col-6 col-md-3';
                                     const isImage = file.type.startsWith('image/');
-                                    col.innerHTML = `<div class="position-relative"><div class="rounded-3 overflow-hidden border bg-light" style="height:120px;">${isImage ? `<img src="${e.target.result}" class="w-100 h-100" style="object-fit:cover;">` : `<div class="w-100 h-100 bg-dark d-flex align-items-center justify-content-center"><i class="feather-play text-white fs-3"></i></div>`}</div><button type="button" class="btn btn-danger btn-xs position-absolute top-0 end-0 rounded-circle" onclick="removeFile(${index})" style="width:20px;height:20px;padding:0;font-size:14px;transform:translate(30%,-30%);">×</button></div>`;
+                                    col.innerHTML = `<div class="position-relative"><div class="rounded-3 overflow-hidden border bg-light" style="height:120px;">${isImage ? `<img src="${e.target.result}" class="w-100 h-100" style="object-fit:cover;">` : `<div class="w-100 h-100 bg-dark d-flex align-items-center justify-content-center"><i class="feather-play text-white fs-3"></i></div>`}</div><button type="button" class="btn btn-danger btn-xs position-absolute top-0 end-0 rounded-circle" onclick="removeFile(${index})" style="width:20px;height:20px;padding:0;font-size:14px;transform:translate(30%,-30%);">&times;</button></div>`;
                                     grid.appendChild(col);
                                 };
                                 reader.readAsDataURL(file);
@@ -101,8 +135,8 @@
 
                     {{-- ============ FEED POSTS ============ --}}
                     @forelse($posts as $post)
-                    <div class="card w-100 shadow-xss rounded-xxl border-0 p-4 mb-3" id="post-{{ $post->id }}">
-                        <div class="d-flex mb-2">
+                    <div class="card w-100 shadow-xss rounded-xxl border-0 p-4 dashboard-post-card" id="post-{{ $post->id }}">
+                        <div class="d-flex mb-3 align-items-center">
                             <a href="{{ route('user.profile', $post->user->username) }}">
                                 <img src="{{ $post->user->profile_picture_url }}"
                                      class="rounded-circle me-2" style="width:45px;height:45px;object-fit:cover;">
@@ -112,6 +146,10 @@
                                     <h4 class="fw-700 font-xssss mb-0 text-grey-900">{{ $post->user->name }}</h4>
                                 </a>
                                 <span class="font-xssss text-grey-500">{{ $post->created_at->diffForHumans() }}</span>
+                                <span class="post-privacy-pill ms-2">
+                                    <i class="{{ in_array($post->privacy, ['followers', 'friends'], true) ? 'feather-users' : 'feather-globe' }}"></i>
+                                    {{ in_array($post->privacy, ['followers', 'friends'], true) ? 'Followers only' : 'Public' }}
+                                </span>
                             </div>
                             
                             @if($post->user_id === auth()->id())
@@ -174,8 +212,8 @@
 
                     {{-- Pagination --}}
                     @if($posts->hasPages())
-                    <div class="d-flex justify-content-center mt-3 mb-5">
-                        {{ $posts->links() }}
+                    <div class="d-flex justify-content-center mt-4 mb-5 dashboard-pagination">
+                        {{ $posts->links('pagination::bootstrap-5') }}
                     </div>
                     @endif
 

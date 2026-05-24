@@ -48,13 +48,16 @@ class Messenger extends Component
 
     public function sendMessage()
     {
-        if (trim($this->newMessage) == '' || !$this->activeConversationId) return;
+        if (trim($this->newMessage) == '' || !$this->activeConversationId)
+            return;
 
-        Message::create([
+        $message = Message::create([
             'conversation_id' => $this->activeConversationId,
             'sender_id' => auth()->id(),
             'body' => $this->newMessage,
         ]);
+
+        $message->conversation()->touch();
 
         // Auto-complete message tasks
         app(TaskAutoCompleteService::class)->check(auth()->user(), 'message');
@@ -67,7 +70,8 @@ class Messenger extends Component
      */
     private function markAsRead()
     {
-        if (!$this->activeConversationId) return;
+        if (!$this->activeConversationId)
+            return;
 
         Message::where('conversation_id', $this->activeConversationId)
             ->where('sender_id', '!=', auth()->id())
@@ -82,9 +86,13 @@ class Messenger extends Component
 
         $conversations = Conversation::where('user_one_id', auth()->id())
             ->orWhere('user_two_id', auth()->id())
-            ->with(['userOne', 'userTwo', 'messages' => function ($q) {
-                $q->latest()->limit(1);
-            }])
+            ->with([
+                'userOne',
+                'userTwo',
+                'messages' => function ($q) {
+                    $q->latest()->limit(1);
+                }
+            ])
             ->get();
 
         // Calculate unread count per conversation

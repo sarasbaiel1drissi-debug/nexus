@@ -8,6 +8,7 @@ use App\Services\TaskAutoCompleteService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -25,7 +26,17 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
+        try {
+            $request->authenticate();
+        } catch (ValidationException $exception) {
+            if ($request->input('login_context') === 'modal') {
+                return back()
+                    ->withErrors($exception->errors(), 'modalLogin')
+                    ->withInput($request->except('password'));
+            }
+
+            throw $exception;
+        }
 
         $request->session()->regenerate();
 

@@ -19,7 +19,7 @@ class PostController extends Controller
         // Validate the request
         $validator = Validator::make($request->all(), [
             'content' => 'nullable|string|max:5000',
-            'privacy' => 'in:public,friends,private',
+            'privacy' => 'required|in:public,followers',
             'media.*' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi|max:20480'
         ]);
         
@@ -76,7 +76,7 @@ class PostController extends Controller
     
     public function destroy($id)
     {
-        $post = Post::find($id);
+        $post = Post::visibleTo(Auth::user())->find($id);
         
         if (!$post) {
             return back()->with('error', 'Post not found');
@@ -128,6 +128,8 @@ class PostController extends Controller
             // Auto-complete like tasks
             app(TaskAutoCompleteService::class)->check(Auth::user(), 'like');
         }
+
+        $post->forceFill(['likes_count' => $post->likes()->count()])->save();
         
         return response()->json([
             'liked' => $liked,
@@ -141,7 +143,7 @@ class PostController extends Controller
             'content' => 'required|string|max:1000'
         ]);
         
-        $post = Post::find($id);
+        $post = Post::visibleTo(Auth::user())->find($id);
         
         if (!$post) {
             return back()->with('error', 'Post not found');
@@ -154,6 +156,7 @@ class PostController extends Controller
         ]);
         
         $post->increment('comments_count');
+        $post->forceFill(['comments_count' => $post->comments()->count()])->save();
 
         // Auto-complete comment tasks
         app(TaskAutoCompleteService::class)->check(Auth::user(), 'comment');
